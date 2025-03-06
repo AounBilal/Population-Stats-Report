@@ -1,10 +1,14 @@
-﻿using System;
+using System;
 using MySql.Data.MySqlClient;
 
 public class DatabaseHelper
 {
+    // Connection string for MySQL database
     private string connectionString = "server=localhost;database=world;user=root;password=;";
 
+    /// <summary>
+    /// Retrieves and displays countries ordered by population.
+    /// </summary>
     public void GetCountriesByPopulation()
     {
         using (MySqlConnection conn = new MySqlConnection(connectionString))
@@ -15,27 +19,28 @@ public class DatabaseHelper
                 string query = "SELECT Code, Name, Continent, Region, Population, Capital FROM country ORDER BY Population DESC;";
 
                 using (MySqlCommand cmd = new MySqlCommand(query, conn))
+                using (MySqlDataReader reader = cmd.ExecuteReader())
                 {
-                    using (MySqlDataReader reader = cmd.ExecuteReader())
-                    {
-                        Console.WriteLine("\nCountries Ordered by Population:");
-                        Console.WriteLine("------------------------------------------------------");
+                    Console.WriteLine("\nCountries Ordered by Population:");
+                    Console.WriteLine("------------------------------------------------------");
 
-                        while (reader.Read())
-                        {
-                            Console.WriteLine($"Code: {reader["Code"]}, Name: {reader["Name"]}, Continent: {reader["Continent"]}, " +
-                                              $"Region: {reader["Region"]}, Population: {reader["Population"]}, Capital: {reader["Capital"]}");
-                        }
+                    while (reader.Read())
+                    {
+                        Console.WriteLine($"Code: {reader["Code"]}, Name: {reader["Name"]}, Continent: {reader["Continent"]}, " +
+                                          $"Region: {reader["Region"]}, Population: {reader["Population"]}, Capital: {reader["Capital"]}");
                     }
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine(" Error: " + ex.Message);
+                Console.WriteLine("Error: " + ex.Message);
             }
         }
     }
 
+    /// <summary>
+    /// Retrieves and displays the top N cities in a given continent by population.
+    /// </summary>
     public void GetTopCitiesInContinent(string continent, int topN)
     {
         using (MySqlConnection conn = new MySqlConnection(connectionString))
@@ -43,9 +48,9 @@ public class DatabaseHelper
             try
             {
                 conn.Open();
-                string query = $"SELECT city.Name, city.CountryCode, city.Population FROM city " +
-                               $"JOIN country ON city.CountryCode = country.Code " +
-                               $"WHERE country.Continent = @Continent ORDER BY city.Population DESC LIMIT @TopN;";
+                string query = "SELECT city.Name, city.CountryCode, city.Population FROM city " +
+                               "JOIN country ON city.CountryCode = country.Code " +
+                               "WHERE country.Continent = @Continent ORDER BY city.Population DESC LIMIT @TopN;";
 
                 using (MySqlCommand cmd = new MySqlCommand(query, conn))
                 {
@@ -66,11 +71,14 @@ public class DatabaseHelper
             }
             catch (Exception ex)
             {
-                Console.WriteLine(" Error: " + ex.Message);
+                Console.WriteLine("Error: " + ex.Message);
             }
         }
     }
 
+    /// <summary>
+    /// Retrieves and displays the total number of speakers for selected languages.
+    /// </summary>
     public void GetLanguageSpeakers()
     {
         using (MySqlConnection conn = new MySqlConnection(connectionString))
@@ -84,22 +92,20 @@ public class DatabaseHelper
                                "GROUP BY Language ORDER BY TotalSpeakers DESC;";
 
                 using (MySqlCommand cmd = new MySqlCommand(query, conn))
+                using (MySqlDataReader reader = cmd.ExecuteReader())
                 {
-                    using (MySqlDataReader reader = cmd.ExecuteReader())
-                    {
-                        Console.WriteLine("\nLanguage Speaker Statistics:");
-                        Console.WriteLine("---------------------------------");
+                    Console.WriteLine("\nLanguage Speaker Statistics:");
+                    Console.WriteLine("---------------------------------");
 
-                        while (reader.Read())
-                        {
-                            Console.WriteLine($"Language: {reader["Language"]}, Total Speakers: {reader["TotalSpeakers"]}");
-                        }
+                    while (reader.Read())
+                    {
+                        Console.WriteLine($"Language: {reader["Language"]}, Total Speakers: {reader["TotalSpeakers"]}");
                     }
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine(" Error: " + ex.Message);
+                Console.WriteLine("Error: " + ex.Message);
             }
         }
     }
